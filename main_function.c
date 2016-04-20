@@ -401,7 +401,7 @@ void computer(int a)									// to draw the sender and receiver computers
 
 
 }
-void cir(float xc,float yc,float r)
+void cir(GLfloat xc,GLfloat yc,GLfloat r)
 {
     float x1,y1,x2,y2;
     float ang;
@@ -428,34 +428,35 @@ void Rec_draw(GLfloat x1,GLfloat y1)
     //glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
     glBegin(GL_POLYGON);
     glVertex2f(x1,y1);
-    glVertex2f(x1+150,y1);
-    glVertex2f(x1+150,y1-20);
+    glVertex2f(x1+90,y1);
+    glVertex2f(x1+90,y1-20);
     glVertex2f(x1,y1-20);
     glEnd();
     glBegin(GL_POLYGON);
-    glVertex2f(x1+140,y1-20);
-    glVertex2f(x1+140,y1-55);
-    glVertex2f(x1+132,y1-55);
-    glVertex2f(x1+132,y1-20);
+    glVertex2f(x1+80,y1-20);
+    glVertex2f(x1+80,y1-35);
+    glVertex2f(x1+72,y1-35);
+    glVertex2f(x1+72,y1-20);
     glEnd();
     glBegin(GL_POLYGON);
-    glVertex2f(x1+122,y1-20);
-    glVertex2f(x1+122,y1-37);
-    glVertex2f(x1+114,y1-37);
-    glVertex2f(x1+114,y1-20);
+    glVertex2f(x1+62,y1-20);
+    glVertex2f(x1+62,y1-27);
+    glVertex2f(x1+64,y1-27);
+    glVertex2f(x1+64,y1-20);
 
     glEnd();
 }
 
-void key(float xc,float yc,float r)
+void key(GLfloat xc,GLfloat yc,GLfloat r)
 {
-;
-    glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(1.0,0.0,0.0);
+	glPushMatrix();
+	glTranslatef(-.17,1.1,.88);
+	glScalef(.9,.9,.9);
+		glColor3f(1.0,0.0,0.0);
     glPointSize(2.0);
-    cir(sc,yc,r);
+    cir(xc,yc,r);
     Rec_draw(xc+r-1,yc+10);
-    glFlush();
+	glPopMatrix();
 }
 
 
@@ -534,6 +535,7 @@ void keygen()
 		drawstring(140.0,380.0,1.0,buffer);
 		computer(50);
 		computer(350);
+		key(100.0,-200.0,23.0);
 		glFlush();
 }
 
