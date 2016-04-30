@@ -3,7 +3,8 @@
 #include<stdlib.h>
 #include<time.h>
 #include<string.h>
-
+#include<math.h>
+#include"src/SOIL.h"
 
 #define		mainmenu		100
 #define  keygeny         0
@@ -18,10 +19,13 @@
 
 
 
-int flag=0;
+int flag=0,flag1=0;
 int p, q, n, phi, e, d, bytes, len;
 int *encoded, *decoded;
-char string[20];
+char string[20],buffer[256];
+GLuint tex_2d;
+GLfloat a=126,b=0,c=0,ang,x2,y2;
+
 void *currentfont;
 
 /**
@@ -200,7 +204,7 @@ int* encodeMessage(int len, int bytes, char* message, int exponent, int modulus)
 		for(j = 0; j < bytes; j++) x += message[i + j] * (1 << (7 * j));
 		encoded[i/bytes] = encode(x, exponent, modulus);
 #ifndef MEASURE
-		printf("%d ", encoded[i/bytes]);
+	//	printf("%d ", encoded[i/bytes]);
 #endif
 	}
 	return encoded;
@@ -242,18 +246,45 @@ void drawstring(float x,float y,float z,char *string) //to display text messages
 		}
 }
 
+void timer()
+{
+	a+=20.0;
+	glutPostRedisplay();
+}
+
 void title()												// to draw the starting screen
 {
+	glClear(GL_COLOR_BUFFER_BIT);
+	//glColor3f(0.0,0.0,1.0);
+
+	glEnable(GL_TEXTURE_2D);
+	//glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
+	tex_2d = SOIL_load_OGL_texture(
+			 "index.jpeg",
+			 SOIL_LOAD_RGB,
+			 SOIL_CREATE_NEW_ID,
+			 SOIL_FLAG_NTSC_SAFE_RGB
+		 );
+	glBindTexture(GL_TEXTURE_2D, tex_2d);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				//determint coordinates of the quad on which you will 'load' an image
 	glBegin(GL_POLYGON);
-				glColor3f(0.0,0.1,0.3);
-				glVertex2i(0,500);
-				glColor3f(0.0,0.5,0.6);
-				glVertex2i(0,0);
-				glColor3f(0.0,0.5,0.6);
-				glVertex2i(500,0);
-				glColor3f(0.0,0.1,0.3);
-				glVertex2i(500,500);
-		glEnd();
+	glTexCoord2f(0.0, 0.0);
+	glColor3f(0.0,0.1,0.3);
+	glVertex2f(500.0,0.0);
+	glTexCoord2f(1.0, 0.0);
+	glColor3f(0.0,0.5,0.6);
+	glVertex2f(0.0,0.0);
+	glTexCoord2f(1.0, 1.0);
+	glColor3f(0.0,0.5,0.6);
+	glVertex2f(0.0,500.0);
+	glTexCoord2f(0.0, 1.0);
+	glColor3f(0.0,0.1,0.3);
+	glVertex2f(500.0,500.0);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+
 	 	setFont(GLUT_BITMAP_HELVETICA_18);
 			glColor3f(1.0,1.0,1.0);
 			drawstring(20.0,435.0,1.0,"     RIVEST SHAMIR ADLEMAN ALGORITHM VISUALIZATION      ");
@@ -265,7 +296,7 @@ void title()												// to draw the starting screen
 			drawstring(180.0,320.0,1.0,"DARA SRAVYA\t\t\t\t\t\t\t\t\t\t\t\t1PE13CS050");
 			glColor3f(1.0,1.0,1.0);
 			drawstring(400.0,100.0,1.0," Press M -> continue");
-			glFlush();
+			glutSwapBuffers();
 }
 
 void draw(int c) // TO DRAW POLYGON FOR DISPLAY MENUS
@@ -319,12 +350,21 @@ void text(void)
 
 	glColor3f(1.0,1.0,1.0);
 	drawstring(185.0,185.0,1.0,"Press X: Exit");
-	glFlush();
+	glutSwapBuffers();
 }
 
-
-
-
+void delay()
+{
+	int i,j;
+	 j=28000;
+	while(j!=0)
+	{	j--;
+		i=28000;
+		while(i!=0)
+		{	i--;
+		}
+	}
+}
 void computer(int a)									// to draw the sender and receiver computers
 {
 
@@ -398,71 +438,29 @@ void computer(int a)									// to draw the sender and receiver computers
 	glVertex2f(a+72,178);
 	glEnd();
 	glFlush();
-
-
 }
-void cir(GLfloat xc,GLfloat yc,GLfloat r)
+void keygenval()
 {
-    float x1,y1,x2,y2;
-    float ang;
-    double radius=r;
-
-    x1=xc,y1=yc;
-    glColor3f(0.85,0.85,0.10);
-
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex2f(x1,y1);
-
-    for(ang=1.0f;ang<361;ang+=0.2)
-    {
-        x2=x1+sin(ang)*radius;
-        y2=y1+cos(ang)*radius;
-        glVertex2f(x2,y2);
-    }
-    glEnd();
+		srand(time(NULL));
+		while(1)
+		{
+				p = randPrime(SINGLE_MAX);
+				q = randPrime(SINGLE_MAX);
+				n = p * q;
+				if(n < 128) {
+					printf("Modulus is less than 128, cannot encode single bytes. Trying again ... ");
+				}
+				else
+					break;
+			}
+			phi = (p - 1) * (q - 1);
+			bytes=1;
+			e = randExponent(phi, EXPONENT_MAX);
+			d = inverse(e, phi);
 }
-
-void Rec_draw(GLfloat x1,GLfloat y1)
-{
-    glColor3f(0.85,0.85,0.10);
-    //glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-    glBegin(GL_POLYGON);
-    glVertex2f(x1,y1);
-    glVertex2f(x1+90,y1);
-    glVertex2f(x1+90,y1-20);
-    glVertex2f(x1,y1-20);
-    glEnd();
-    glBegin(GL_POLYGON);
-    glVertex2f(x1+80,y1-20);
-    glVertex2f(x1+80,y1-35);
-    glVertex2f(x1+72,y1-35);
-    glVertex2f(x1+72,y1-20);
-    glEnd();
-    glBegin(GL_POLYGON);
-    glVertex2f(x1+62,y1-20);
-    glVertex2f(x1+62,y1-27);
-    glVertex2f(x1+64,y1-27);
-    glVertex2f(x1+64,y1-20);
-
-    glEnd();
-}
-
-void key(GLfloat xc,GLfloat yc,GLfloat r)
-{
-	glPushMatrix();
-	glTranslatef(-.17,1.1,.88);
-	glScalef(.9,.9,.9);
-		glColor3f(1.0,0.0,0.0);
-    glPointSize(2.0);
-    cir(xc,yc,r);
-    Rec_draw(xc+r-1,yc+10);
-	glPopMatrix();
-}
-
-
 void keygen()
 {
-	char buffer[256];
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBegin(GL_POLYGON);
 				glColor3f(0.0,0.1,0.3);
@@ -477,37 +475,26 @@ void keygen()
 		setFont(GLUT_BITMAP_HELVETICA_18);
 		glColor3f(0.5,1.0,1.0);
 		drawstring(150.0,480.0,1.0,"KEY GENERATION ");
-		srand(time(NULL));
 		setFont(GLUT_BITMAP_HELVETICA_18);
-		while(1)
-		{
 			glColor3f(0.5,1.0,1.0);
-			p = randPrime(SINGLE_MAX);
+
 			sprintf(buffer,"%d", p);
 			drawstring(12.0,455.0,1.0,"Got first prime factor, p = ");
 			glColor3f(0.5,1.0,1.0);
 			drawstring(122.0,455.0,1.0,buffer);
-			q = randPrime(SINGLE_MAX);
+
 			sprintf(buffer,"%d", q);
 			glColor3f(0.5,1.0,1.0);
 			drawstring(12.0,440.0,1.0,"Got second prime factor, q = ");
 			glColor3f(0.5,1.0,1.0);
 			drawstring(132.0,440.0,1.0,buffer);
-			n = p * q;
+
 			sprintf(buffer,"%d", n);
 			glColor3f(0.5,1.0,1.0);
 			drawstring(12.0,425.0,1.0,"Got modulus,n = pq where n = ");
 			glColor3f(0.5,1.0,1.0);
 			drawstring(144.0,425.0,1.0,buffer);
-			if(n < 128) {
-				printf("Modulus is less than 128, cannot encode single bytes. Trying again ... ");
-			}
-			else
-				break;
-		}
-		phi = (p - 1) * (q - 1);
-		bytes=1;
-		e = randExponent(phi, EXPONENT_MAX);
+
 		sprintf(buffer,"%d", e);
 		glColor3f(0.5,1.0,1.0);
 		drawstring(12.0,410.0,1.0,"The exponent is = ");
@@ -522,7 +509,7 @@ void keygen()
 		sprintf(buffer,"%d", n);
 		glColor3f(0.5,1.0,1.0);
 		drawstring(114.0,395.0,1.0,buffer);
-		d = inverse(e, phi);
+
 		sprintf(buffer,"%d", d);
 		glColor3f(0.5,1.0,1.0);
 		drawstring(12.0,380.0,1.0,"The private key is =  ");
@@ -535,10 +522,206 @@ void keygen()
 		drawstring(140.0,380.0,1.0,buffer);
 		computer(50);
 		computer(350);
-		key(100.0,-200.0,23.0);
-		glFlush();
+		glColor3f(0.0,0.0,0.0);
+		glBegin(GL_POLYGON);
+		glVertex2f(145,190);
+		glVertex2f(370,190);
+		glVertex2f(370,170);
+		glVertex2f(145,170);
+		glEnd();
+
+		setFont(GLUT_BITMAP_HELVETICA_12);
+		sprintf(buffer,"%d", e);
+		drawstring(77.0,204.0,1.0,buffer);
+		sprintf(buffer,"%d",n);
+		drawstring(90.0,204.0,1.0,buffer);
+
+		if(a>=280.0)
+		{
+				a=1000.0;
+				setFont(GLUT_BITMAP_HELVETICA_12);
+				sprintf(buffer,"%d", e);
+				drawstring(377.0,204.0,1.0,buffer);
+				sprintf(buffer,"%d",n);
+				drawstring(390.0,204.0,1.0,buffer);
+
+				setFont(GLUT_BITMAP_HELVETICA_18);
+				drawstring(250.0,100.0,1.0,"Key transmitted");
+				glFlush();
+			}
+
+
 }
 
+void decryptmes()
+{
+	int i;
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glBegin(GL_POLYGON);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(0,500);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(0,0);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(500,0);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(500,500);
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		//glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
+		tex_2d = SOIL_load_OGL_texture(
+				 "rsaf2.png",
+				 SOIL_LOAD_RGB,
+				 SOIL_CREATE_NEW_ID,
+				 SOIL_FLAG_NTSC_SAFE_RGB
+			 );
+		glBindTexture(GL_TEXTURE_2D, tex_2d);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					//determint coordinates of the quad on which you will 'load' an image
+		glPushMatrix();
+		glRotatef(180,0.0,0.0,0.0);
+		glTranslatef(25.0,350.0,0.0);
+		glScalef(0.52,0.5,0.5);
+		glBegin(GL_POLYGON);
+		glColor3f(1.0,1.0,1.0);
+		glTexCoord2f(0.0, 0.0);
+		glVertex2f(250.0,50.0);
+		glTexCoord2f(1.0, 0.0);
+		glVertex2f(50.0,50.0);
+		glTexCoord2f(1.0, 1.0);
+		glVertex2f(50.0,150.0);
+		glTexCoord2f(0.0, 1.0);
+		glVertex2f(250.0,150.0);
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+		glPopMatrix();
+
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		glColor3f(0.5,1.0,1.0);
+		drawstring(150.0,480.0,1.0,"DECRYPTION ");
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		glPushMatrix();
+		glTranslatef(0.0,10.0,0.0);
+		glScalef(1.8,1.8,1.8);
+		computer(0);
+		glPopMatrix();
+
+		drawstring(150.0,200.0,1.0,"The message after decryption is.....");
+		decoded = decodeMessage(len/bytes, bytes, encoded, d, n);
+		for(i = 0; i < len; i += bytes)
+		{
+			sprintf(buffer ,"%c ", decoded[i]);
+			drawstring(150.0+i*40,160.0,1.0,buffer);
+		}
+		glColor3f(0.2,0.5,0.6);
+		glBegin(GL_LINES);
+		glVertex2f(150.0,155.0);
+		glVertex2f(150.0+i*50,155.0);
+		glEnd();
+
+		glutSwapBuffers();
+
+}
+void encryptmes()
+{
+	int i;
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glBegin(GL_POLYGON);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(0,500);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(0,0);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(500,0);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(500,500);
+		glEnd();
+		glEnable(GL_TEXTURE_2D);
+		//glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
+		tex_2d = SOIL_load_OGL_texture(
+				 "rsaf1.jpg",
+				 SOIL_LOAD_RGB,
+				 SOIL_CREATE_NEW_ID,
+				 SOIL_FLAG_NTSC_SAFE_RGB
+			 );
+		glBindTexture(GL_TEXTURE_2D, tex_2d);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+					//determint coordinates of the quad on which you will 'load' an image
+		glPushMatrix();
+		glRotatef(180,0.0,0.0,0.0);
+		glTranslatef(25.0,350.0,0.0);
+		glScalef(0.52,0.5,0.5);
+		glBegin(GL_POLYGON);
+		glColor3f(1.0,1.0,1.0);
+		glTexCoord2f(0.0, 0.0);
+		glVertex2f(250.0,50.0);
+		glTexCoord2f(1.0, 0.0);
+		glVertex2f(50.0,50.0);
+		glTexCoord2f(1.0, 1.0);
+		glVertex2f(50.0,150.0);
+		glTexCoord2f(0.0, 1.0);
+		glVertex2f(250.0,150.0);
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+		glPopMatrix();
+
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		glColor3f(0.5,1.0,1.0);
+		drawstring(150.0,480.0,1.0,"ENCRYPTION ");
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		glPushMatrix();
+		glTranslatef(0.0,10.0,0.0);
+		glScalef(1.8,1.8,1.8);
+		computer(0);
+		glPopMatrix();
+
+		drawstring(150.0,200.0,1.0,"The message after encryption is.....");
+		encoded = encodeMessage(len, bytes, string, e, n);
+		for(i = 0; i < len; i += bytes)
+		{
+			sprintf(buffer ,"%d ", encoded[i/bytes]);
+			drawstring(150.0+i*40,160.0,1.0,buffer);
+		}
+		glColor3f(0.2,0.5,0.6);
+		glBegin(GL_LINES);
+		glVertex2f(150.0,155.0);
+		glVertex2f(150.0+i*50,155.0);
+		glEnd();
+		glColor3f(0.0,0.0,0.0);
+		for(i = 0; i < len; i += bytes)
+		{
+			sprintf(buffer ,"%c ", string[i]);
+			drawstring(150.0+i*50,140.0,1.0,buffer);
+		}
+
+		glutSwapBuffers();
+
+}
+
+void message(int a)
+{
+	glColor3f(0.0,0.0,1.0);
+	glBegin(GL_POLYGON);
+	glVertex3f(a+20,750,0);
+	glVertex3f(a+20,800,0);
+	glVertex3f(a+90,800,0);
+	glVertex3f(a+90,750,0);
+	glEnd();
+	glFlush();
+
+	glColor3f(0.0,0.5,0.5);
+	glBegin(GL_POLYGON);
+	glVertex3f(a+90,800,0);
+	glVertex3f(a+20,800,0);
+	glVertex3f(a+55,775,0);
+	glEnd();
+	glFlush();
+
+}
 
 void mykeyboard(unsigned char key,int x,int y)
 {
@@ -546,18 +729,16 @@ void mykeyboard(unsigned char key,int x,int y)
 	{
 		case 'x':
 		case 'X':exit(0);break;
-		case 'e':
-		case 'E':
 		case 's':
 		case 'S':
-	  	case 'a':
+	  case 'a':
 		case 'A':
 		case 'b':
 		case 'B':
 		case 'c':
-		case 'C':
+		case 'C':break;
 		case 'd':
-		case 'D':
+		case 'D':flag=1;flag1=4;glutPostRedisplay();break;
 		case 'f':
 		case 'F':
 		case 'g':
@@ -569,24 +750,24 @@ void mykeyboard(unsigned char key,int x,int y)
 		case 'j':
 		case 'J':break;
 		case 'k':
-		case 'K':keygen();break;
-		case 'w':
-		case 'W':
+		case 'K':keygenval();flag1=1;a=126.0;glutPostRedisplay();break;
+		case 'e':
+		case 'E':flag=1;flag1=2;glutPostRedisplay();break;
 		case 'r':
 		case 'R':
 		case 'p':
 		case 'P':
 		case 't':
-		case 'T':break;
+		case 'T':flag=1,flag1=3;glutPostRedisplay();break;
 		case 'y':
-		case 'Y':flag=1;glutPostRedisplay();break;
+		case 'Y':flag=1;flag1=0;glutPostRedisplay();break;
 		case 'n':
 		case 'N':exit(0);break;
 		case 'm':
-		case 'M':flag=1;glutPostRedisplay();break;
+		case 'M':flag=1;flag1=0;glutPostRedisplay();break;
 		default:return;
 	}
-	//glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 
@@ -605,9 +786,43 @@ void myInit()
 						glVertex2i(500,500);
 				glEnd();
 			glPointSize(5.0);
-			gluOrtho2D(0.0,500.0,0.0,500.0);
+
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
+			gluOrtho2D(0.0,500.0,0.0,500.0);
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+}
+
+void messaget()
+{
+	glBegin(GL_POLYGON);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(0,500);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(0,0);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(500,0);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(500,500);
+		glEnd();
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		glColor3f(0.5,1.0,1.0);
+		drawstring(150.0,480.0,1.0,"MESSAGE TRANSMISSION");
+		glColor3f(0.0,0.0,0.0);
+		drawstring(50.0,320.0,1.0,"Message sent");
+		glPushMatrix();
+		glScalef(1.5,1.5,1.5);
+		computer(0);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(0.0,-50.0,0.0);
+		glScalef(1.5,1.5,1.5);
+		computer(200);
+		glPopMatrix();
+
+		if(b>=850)
+		 drawstring(350.0,300.0,1.0,"Message recieved");
 }
 
 void display(void)
@@ -619,7 +834,135 @@ void display(void)
 	}
 	if(flag==1)
 	{
-		text();
+		if(flag1==0)
+ 		text();
+		else if(flag1==1)
+		{
+			keygen();
+			while(1)
+			{
+			glClear(GL_COLOR_BUFFER_BIT);
+			keygen();
+			glPushMatrix();
+			glTranslatef(a,0.0,0.0);
+			glScalef(0.2,0.2,0.2);
+			glPushMatrix();
+			glTranslated(a,0.0,0.0);
+			glColor3f(0.85,0.85,0.10);
+			glBegin(GL_POLYGON);//rectangular body
+			glVertex2f(122.0,910.0);
+			glVertex2f(212.0,910.0);
+			glVertex2f(212.0,890.0);
+			glVertex2f(122.0,890.0);
+			glEnd();
+			glPopMatrix();
+
+			glPushMatrix();
+			glTranslated(a,0.0,0.0);
+			glColor3f(0.85,0.85,0.10);
+			glBegin(GL_POLYGON);
+			glVertex2f(202.0,890.0);
+			glVertex2f(202.0,875.0);
+			glVertex2f(194.0,875.0);
+			glVertex2f(194.0,890.0);
+			glEnd();
+			glPopMatrix();
+
+			glPushMatrix();
+			glTranslated(a,0.0,0.0);
+			glColor3f(0.85,0.85,0.10);
+			glBegin(GL_POLYGON);
+			glVertex2f(184.0,890.0);
+			glVertex2f(184.0,883.0);
+			glVertex2f(186.0,883.0);
+			glVertex2f(186.0,890.0);
+			glEnd();
+			glPopMatrix();
+
+			glPushMatrix();
+			glTranslated(a,0.0,0.0);
+			glColor3f(0.85,0.85,0.10);
+			glBegin(GL_TRIANGLE_FAN);
+			glVertex2f(100.0,900.0);
+				for(ang=1.0f;ang<361;ang+=0.2)
+				{
+					x2=100.0+sin(ang)*23;
+					y2=900.0+cos(ang)*23;
+					glVertex2f(x2,y2);
+			}
+			glEnd();
+			glPopMatrix();
+
+			glPushMatrix();
+			glTranslated(a,0.0,0.0);
+			glColor3f(0.0,0.0,0.0);
+			glBegin(GL_TRIANGLE_FAN);
+			glVertex2f(100.0,900.0);
+				for(ang=1.0f;ang<361;ang+=0.2)
+				{
+					x2=100.0+sin(ang)*15;
+					y2=900.0+cos(ang)*15;
+					glVertex2f(x2,y2);
+			}
+			glEnd();
+			glPopMatrix();
+			//delay();
+			/*glPushMatrix();
+			glColor3f(0.0,0.0,00.0);
+			glBegin(GL_POLYGON);//rectangular body
+			glVertex2f(100.0,910.0);
+			glVertex2f(212.0,910.0);
+			glVertex2f(212.0,850.0);
+			glVertex2f(100.0,850.0);
+			glEnd();*/
+				glutPostRedisplay();
+
+			glPopMatrix();
+			glutSwapBuffers();
+
+
+			a=a+0.5;
+			if(a>280.0)
+			{
+				a+=120;
+				break;
+			}
+		}
+	}
+	else if(flag1==2)
+	{
+		encryptmes();
+	}
+	else if(flag1==3)
+	{
+		messaget();
+		while(1)
+		{
+			glClear(GL_COLOR_BUFFER_BIT);
+			messaget();
+			glPushMatrix();
+			glScalef(0.3,0.3,0.3);
+			glTranslatef(b,c,0.0);
+			message(200);
+			glPopMatrix();
+
+			glutPostRedisplay();
+			glutSwapBuffers();
+			if(c>120)
+			  c=c-20.0;
+			if(c<120 && b<850)
+				b=b+3.0;
+			if(b>=850)
+			{
+				b=b+200.0;
+				break;
+			}
+		}
+	}
+	else if(flag1==4)
+	{
+		decryptmes();
+	}
 	}
 
 }
@@ -628,8 +971,9 @@ int main(int argc, char ** argv)
 {
      	printf("\nEnter a message less than ten characters\n");
      	scanf("%s",string);
+			len=strlen(string);
 			glutInit(&argc,argv);
-      glutInitDisplayMode(GLUT_SINGLE|GLUT_RGBA);
+      glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE);
       glutInitWindowPosition(0,0);
       glutInitWindowSize(1000,1000);
       glutCreateWindow("RSA ");
