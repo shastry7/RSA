@@ -255,12 +255,12 @@ void timer()
 void title()												// to draw the starting screen
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-	//glColor3f(0.0,0.0,1.0);
+	glColor3f(1.0,1.0,1.0);
 
 	glEnable(GL_TEXTURE_2D);
 	//glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
 	tex_2d = SOIL_load_OGL_texture(
-			 "index.jpeg",
+			 "f.png",
 			 SOIL_LOAD_RGB,
 			 SOIL_CREATE_NEW_ID,
 			 SOIL_FLAG_NTSC_SAFE_RGB
@@ -285,9 +285,10 @@ void title()												// to draw the starting screen
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 
-	 	setFont(GLUT_BITMAP_HELVETICA_18);
+	 		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
 			glColor3f(1.0,1.0,1.0);
-			drawstring(20.0,435.0,1.0,"     RIVEST SHAMIR ADLEMAN ALGORITHM VISUALIZATION      ");
+			drawstring(20.0,435.0,1.0,"            RIVEST SHAMIR ADLEMAN ALGORITHM VISUALIZATION      ");
+			setFont(GLUT_BITMAP_HELVETICA_18);
 			glColor3f(1.0,1.0,1.0);
 			drawstring(210.0,365.0,1.0,"		SUBMITTED BY	");
 			glColor3f(1.0,1.0,1.0);
@@ -315,27 +316,47 @@ void draw(int c) // TO DRAW POLYGON FOR DISPLAY MENUS
 }
 void text(void)
 {
+
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBegin(GL_POLYGON);
+	glEnable(GL_TEXTURE_2D);
+	//glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
+	tex_2d = SOIL_load_OGL_texture(
+			 "f.png",
+			 SOIL_LOAD_RGB,
+			 SOIL_CREATE_NEW_ID,
+			 SOIL_FLAG_NTSC_SAFE_RGB
+		 );
+	glBindTexture(GL_TEXTURE_2D, tex_2d);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				//determint coordinates of the quad on which you will 'load' an image
+				glBegin(GL_POLYGON);
+				glTexCoord2f(0.0, 0.0);
 				glColor3f(0.0,0.1,0.3);
-				glVertex2i(0,500);
+				glVertex2f(500.0,0.0);
+				glTexCoord2f(1.0, 0.0);
 				glColor3f(0.0,0.5,0.6);
-				glVertex2i(0,0);
+				glVertex2f(0.0,0.0);
+				glTexCoord2f(1.0, 1.0);
 				glColor3f(0.0,0.5,0.6);
-				glVertex2i(500,0);
+				glVertex2f(0.0,500.0);
+				glTexCoord2f(0.0, 1.0);
 				glColor3f(0.0,0.1,0.3);
-				glVertex2i(500,500);
-		glEnd();
+				glVertex2f(500.0,500.0);
+				glEnd();
+				glDisable(GL_TEXTURE_2D);
+
 	draw(0);
 	draw(55);
 	draw(110);
 	draw(165);
 	draw(220);
 
-	setFont(GLUT_BITMAP_HELVETICA_18);
-	glColor3f(0.5,1.0,1.0);
-	drawstring(152.0,455.0,1.0,"\t\t\t\t\t\tRSA ALGORITHM");
+	setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+	glColor3f(1.0,1.0,1.0);
+	drawstring(152.0,455.0,1.0,"\t\t\t\t\tRSA ALGORITHM");
 
+	setFont(GLUT_BITMAP_HELVETICA_18);
 	glColor3f(1.0,1.0,1.0);
 	drawstring(185.0,405.0,1.0,"Press K: Key generation");
 
@@ -350,6 +371,10 @@ void text(void)
 
 	glColor3f(1.0,1.0,1.0);
 	drawstring(185.0,185.0,1.0,"Press X: Exit");
+
+	glColor3f(1.0,1.0,1.0);
+	drawstring(400.0,100.0,1.0," Press R -> return");
+
 	glutSwapBuffers();
 }
 
@@ -367,19 +392,28 @@ void delay()
 }
 void computer(int a)									// to draw the sender and receiver computers
 {
-
-	glColor3f(0.0,0.0,1.0);//monitor
+	glColor3f(0.0,0.0,0.0);//monitor
 	glBegin(GL_LINE_LOOP);
 	glVertex3f(a+25,200,0);
 	glVertex3f(a+25,250,0);
 	glVertex3f(a+90,250,0);
 	glVertex3f(a+90,200,0);
 	glEnd();
+
+	glColor3f(0.0,0.0,1.0);//monitor
+	glBegin(GL_POLYGON);
+	glVertex3f(a+25,200,0);
+	glColor3f(0.0,0.6,0.5);
+	glVertex3f(a+25,250,0);
+	glColor3f(0.0,0.0,1.0);
+	glVertex3f(a+90,250,0);
+	glVertex3f(a+90,200,0);
+	glEnd();
 	glFlush();
 
 
-	glColor3f(0.0,1.0,0.0);// INNER monitor
-	glBegin(GL_LINE_LOOP);
+	glColor3f(1.0,1.0,1.0);// INNER monitor
+	glBegin(GL_POLYGON);
 	glVertex2f(a+27,202);
 	glVertex2f(a+27,248);
 	glVertex2f(a+88,248);
@@ -408,6 +442,7 @@ void computer(int a)									// to draw the sender and receiver computers
 	glFlush();
 
 
+
 	//glColor3f(5.2,0.6,0.2); //CPU
 	glBegin(GL_POLYGON);
 	glVertex2f(a+20,190);
@@ -418,6 +453,14 @@ void computer(int a)									// to draw the sender and receiver computers
 	glEnd();
 	glFlush();
 
+	glBegin(GL_LINE_LOOP);
+	glColor3f(1.0,1.0,1.0);
+	glVertex2f(a+20,190);
+	glVertex2f(a+95,190);
+	glVertex2f(a+95,170);
+	glVertex2f(a+20,170);
+	glEnd();
+	glFlush();
 
 	glColor3f(0.7,0.8,0.2);  //CPU CD DRIVE
 	glBegin(GL_QUADS);
@@ -472,9 +515,9 @@ void keygen()
 				glColor3f(0.0,0.1,0.3);
 				glVertex2i(500,500);
 		glEnd();
-		setFont(GLUT_BITMAP_HELVETICA_18);
-		glColor3f(0.5,1.0,1.0);
-		drawstring(150.0,480.0,1.0,"KEY GENERATION ");
+		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+		glColor3f(1.0,1.0,1.0);
+		drawstring(150.0,480.0,1.0,"KEY GENERATION \n");
 		setFont(GLUT_BITMAP_HELVETICA_18);
 			glColor3f(0.5,1.0,1.0);
 
@@ -532,21 +575,21 @@ void keygen()
 
 		setFont(GLUT_BITMAP_HELVETICA_12);
 		sprintf(buffer,"%d", e);
-		drawstring(77.0,204.0,1.0,buffer);
+		drawstring(85.0,215.0,1.0,buffer);
 		sprintf(buffer,"%d",n);
-		drawstring(90.0,204.0,1.0,buffer);
+		drawstring(100.0,215.0,1.0,buffer);
 
 		if(a>=280.0)
 		{
 				a=1000.0;
 				setFont(GLUT_BITMAP_HELVETICA_12);
 				sprintf(buffer,"%d", e);
-				drawstring(377.0,204.0,1.0,buffer);
+				drawstring(385.0,215.0,1.0,buffer);
 				sprintf(buffer,"%d",n);
-				drawstring(390.0,204.0,1.0,buffer);
+				drawstring(400.0,215.0,1.0,buffer);
 
 				setFont(GLUT_BITMAP_HELVETICA_18);
-				drawstring(250.0,100.0,1.0,"Key transmitted");
+				drawstring(210.0,100.0,1.0,"Key transmitted");
 				glFlush();
 			}
 
@@ -568,6 +611,17 @@ void decryptmes()
 				glColor3f(0.0,0.1,0.3);
 				glVertex2i(500,500);
 		glEnd();
+
+		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+		glColor3f(1.0,1.0,1.0);
+		drawstring(150.0,480.0,1.0,"DECRYPTION ");
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		glPushMatrix();
+		glTranslatef(0.0,10.0,0.0);
+		glScalef(1.8,1.8,1.8);
+		computer(0);
+		glPopMatrix();
+
 		glEnable(GL_TEXTURE_2D);
 		//glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
 		tex_2d = SOIL_load_OGL_texture(
@@ -596,16 +650,6 @@ void decryptmes()
 		glVertex2f(250.0,150.0);
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
-		glPopMatrix();
-
-		setFont(GLUT_BITMAP_HELVETICA_18);
-		glColor3f(0.5,1.0,1.0);
-		drawstring(150.0,480.0,1.0,"DECRYPTION ");
-		setFont(GLUT_BITMAP_HELVETICA_18);
-		glPushMatrix();
-		glTranslatef(0.0,10.0,0.0);
-		glScalef(1.8,1.8,1.8);
-		computer(0);
 		glPopMatrix();
 
 		drawstring(150.0,200.0,1.0,"The message after decryption is.....");
@@ -639,6 +683,18 @@ void encryptmes()
 				glColor3f(0.0,0.1,0.3);
 				glVertex2i(500,500);
 		glEnd();
+
+
+		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+		glColor3f(1.0,1.0,1.0);
+		drawstring(150.0,480.0,1.0,"ENCRYPTION ");
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		glPushMatrix();
+		glTranslatef(0.0,10.0,0.0);
+		glScalef(1.8,1.8,1.8);
+		computer(0);
+		glPopMatrix();
+
 		glEnable(GL_TEXTURE_2D);
 		//glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
 		tex_2d = SOIL_load_OGL_texture(
@@ -647,6 +703,7 @@ void encryptmes()
 				 SOIL_CREATE_NEW_ID,
 				 SOIL_FLAG_NTSC_SAFE_RGB
 			 );
+
 		glBindTexture(GL_TEXTURE_2D, tex_2d);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -667,16 +724,6 @@ void encryptmes()
 		glVertex2f(250.0,150.0);
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
-		glPopMatrix();
-
-		setFont(GLUT_BITMAP_HELVETICA_18);
-		glColor3f(0.5,1.0,1.0);
-		drawstring(150.0,480.0,1.0,"ENCRYPTION ");
-		setFont(GLUT_BITMAP_HELVETICA_18);
-		glPushMatrix();
-		glTranslatef(0.0,10.0,0.0);
-		glScalef(1.8,1.8,1.8);
-		computer(0);
 		glPopMatrix();
 
 		drawstring(150.0,200.0,1.0,"The message after encryption is.....");
@@ -754,7 +801,7 @@ void mykeyboard(unsigned char key,int x,int y)
 		case 'e':
 		case 'E':flag=1;flag1=2;glutPostRedisplay();break;
 		case 'r':
-		case 'R':
+		case 'R':flag=0;glutPostRedisplay();break;
 		case 'p':
 		case 'P':
 		case 't':
@@ -807,10 +854,8 @@ void messaget()
 				glVertex2i(500,500);
 		glEnd();
 		setFont(GLUT_BITMAP_HELVETICA_18);
-		glColor3f(0.5,1.0,1.0);
-		drawstring(150.0,480.0,1.0,"MESSAGE TRANSMISSION");
 		glColor3f(0.0,0.0,0.0);
-		drawstring(50.0,320.0,1.0,"Message sent");
+		drawstring(150.0,480.0,1.0,"MESSAGE TRANSMISSION");
 		glPushMatrix();
 		glScalef(1.5,1.5,1.5);
 		computer(0);
@@ -820,7 +865,8 @@ void messaget()
 		glScalef(1.5,1.5,1.5);
 		computer(200);
 		glPopMatrix();
-
+		glColor3f(0.0,0.0,0.0);
+		drawstring(50.0,320.0,1.0,"Message Sent");
 		if(b>=850)
 		 drawstring(350.0,300.0,1.0,"Message recieved");
 }
