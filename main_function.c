@@ -6,25 +6,16 @@
 #include<math.h>
 #include"src/SOIL.h"
 
-#define		mainmenu		100
-#define  keygeny         0
-#define   transmitkey   1
-#define  encrypt		2
-#define  decrypt    3
-#define  exite		4
-
 #define ACCURACY 5
 #define SINGLE_MAX 10000
 #define EXPONENT_MAX 1000
 
-
-
-int flag=0,flag1=0;
-int p, q, n, phi, e, d, bytes, len;
+int flag=0,flag1=0,kflag=0;
+int p, q, n, phi, e, d, bytes, len,sp=0,x,y;
 int *encoded, *decoded;
 char string[20],buffer[256];
 GLuint tex_2d;
-GLfloat a=126,b=0,c=0,ang,x2,y2;
+GLfloat a=126,b=0,c=00,ang,x2,y2;
 
 void *currentfont;
 
@@ -46,6 +37,7 @@ int modpow(long long a, long long b, int c) {
 	while(b > 0) {
 		if(b & 1) {
 			res = (res * a) % c;
+				printf("%d\n",res );
 		}
 		b = b >> 1;
 		a = (a * a) % c;
@@ -351,29 +343,34 @@ void text(void)
 	draw(110);
 	draw(165);
 	draw(220);
+	draw(275);
 
 	setFont(GLUT_BITMAP_TIMES_ROMAN_24);
 	glColor3f(1.0,1.0,1.0);
 	drawstring(152.0,455.0,1.0,"\t\t\t\t\tRSA ALGORITHM");
 
 	setFont(GLUT_BITMAP_HELVETICA_18);
-	glColor3f(1.0,1.0,1.0);
-	drawstring(185.0,405.0,1.0,"Press K: Key generation");
 
 	glColor3f(1.0,1.0,1.0);
-	drawstring(185.0,350.0,1.0,"Press E: Encryption");
+	drawstring(185.0,405.0,1.0,"Press SpaceBar: Input");
 
 	glColor3f(1.0,1.0,1.0);
-	drawstring(185.0,295.0,1.0,"Press T: Message transmission");
+	drawstring(185.0,350.0,1.0,"Press K: Key generation");
 
 	glColor3f(1.0,1.0,1.0);
-	drawstring(185.0,240.0,1.0,"Press D :Decryption");
+	drawstring(185.0,295.0,1.0,"Press E: Encryption");
 
 	glColor3f(1.0,1.0,1.0);
-	drawstring(185.0,185.0,1.0,"Press X: Exit");
+	drawstring(185.0,240.0,1.0,"Press T: Message transmission");
 
 	glColor3f(1.0,1.0,1.0);
-	drawstring(400.0,100.0,1.0," Press R -> return");
+	drawstring(185.0,185.0,1.0,"Press D :Decryption");
+
+	glColor3f(1.0,1.0,1.0);
+	drawstring(185.0,130.0,1.0,"Press X: Exit");
+
+	glColor3f(1.0,1.0,1.0);
+	drawstring(400.0,80.0,1.0," Press R -> return");
 
 	glutSwapBuffers();
 }
@@ -559,10 +556,10 @@ void keygen()
 		glColor3f(0.5,1.0,1.0);
 		drawstring(100.0,380.0,1.0,buffer);
 		glColor3f(0.5,1.0,1.0);
-		drawstring(120.0,380.0,1.0," , ");
+		drawstring(137.0,380.0,1.0," , ");
 		sprintf(buffer,"%d", n);
 		glColor3f(0.5,1.0,1.0);
-		drawstring(140.0,380.0,1.0,buffer);
+		drawstring(150.0,380.0,1.0,buffer);
 		computer(50);
 		computer(350);
 		glColor3f(0.0,0.0,0.0);
@@ -593,6 +590,9 @@ void keygen()
 				glFlush();
 			}
 
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		drawstring(300.0,30.0,1.0,"Press Y to continue to the main menu" );
+		drawstring(300.0,15.0,1.0,"Press N to terminate");
 
 }
 
@@ -671,6 +671,7 @@ void decryptmes()
 void encryptmes()
 {
 	int i;
+	len=sp;
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glBegin(GL_POLYGON);
@@ -731,20 +732,22 @@ void encryptmes()
 		for(i = 0; i < len; i += bytes)
 		{
 			sprintf(buffer ,"%d ", encoded[i/bytes]);
-			drawstring(150.0+i*40,160.0,1.0,buffer);
+			drawstring(10.0+i*50,160.0,1.0,buffer);
 		}
 		glColor3f(0.2,0.5,0.6);
 		glBegin(GL_LINES);
-		glVertex2f(150.0,155.0);
-		glVertex2f(150.0+i*50,155.0);
+		glVertex2f(10.0,155.0);
+		glVertex2f(10.0+i*50,155.0);
 		glEnd();
 		glColor3f(0.0,0.0,0.0);
 		for(i = 0; i < len; i += bytes)
 		{
 			sprintf(buffer ,"%c ", string[i]);
-			drawstring(150.0+i*50,140.0,1.0,buffer);
+			drawstring(18.0+i*50,140.0,1.0,buffer);
 		}
-
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		drawstring(300.0,30.0,1.0,"Press Y to continue to the main menu" );
+		drawstring(300.0,15.0,1.0,"Press N to terminate");
 		glutSwapBuffers();
 
 }
@@ -770,10 +773,89 @@ void message(int a)
 
 }
 
+void messaget()
+{
+	glBegin(GL_POLYGON);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(0,500);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(0,0);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(500,0);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(500,500);
+		glEnd();
+		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+		glColor3f(1.0,1.0,1.0);
+		drawstring(150.0,480.0,1.0,"MESSAGE TRANSMISSION");
+		glPushMatrix();
+		glScalef(1.5,1.5,1.5);
+		computer(0);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(0.0,-20.0,0.0);
+		glScalef(1.5,1.5,1.5);
+		computer(200);
+		glPopMatrix();
+		glColor3f(0.0,0.0,0.0);
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		glColor3f(0.0,0.0,0.0);
+		drawstring(50.0,320.0,1.0,"Message Sent");
+		if(b>=850)
+		 drawstring(350.0,300.0,1.0,"Message recieved");
+		setFont(GLUT_BITMAP_HELVETICA_18);
+ 		drawstring(300.0,30.0,1.0,"Press Y to continue to the main menu" );
+ 		drawstring(300.0,15.0,1.0,"Press N to terminate");
+}
+
+void inputtext()
+{
+	glBegin(GL_POLYGON);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(0,500);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(0,0);
+				glColor3f(0.0,0.5,0.6);
+				glVertex2i(500,0);
+				glColor3f(0.0,0.1,0.3);
+				glVertex2i(500,500);
+		glEnd();
+		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+		glColor3f(1.0,1.0,1.0);
+		drawstring(150.0,480.0,1.0,"INPUT");
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		glColor3f(0.5,1.0,1.0);
+		drawstring(100.0,450.0,1.0,"Enter The String And Press Enter To Finish The Given Input");
+		glPushMatrix();
+		glScalef(1.8,1.8,1.8);
+		glTranslatef(-45.0,-25.0,0.0);
+		computer(100);
+		glPopMatrix();
+
+		glColor3f(0.0,0.0,0.0);
+		drawstring(180.0,350.0,1.0,string);
+		setFont(GLUT_BITMAP_HELVETICA_18);
+		drawstring(300.0,30.0,1.0,"Press Y to continue to the main menu" );
+		drawstring(300.0,15.0,1.0,"Press N to terminate");
+		glutSwapBuffers();
+}
+void clearstring()
+{
+	int k;
+	for(k=0;k<=20;k++)
+		string[k]=' ';
+}
+
 void mykeyboard(unsigned char key,int x,int y)
 {
+
+	if(key==13)
+	 kflag=0;
+	if(kflag==0)
+	{
 	switch(key)
 	{
+		case 32 :kflag=1;sp=0;clearstring();break;
 		case 'x':
 		case 'X':exit(0);break;
 		case 's':
@@ -805,7 +887,7 @@ void mykeyboard(unsigned char key,int x,int y)
 		case 'p':
 		case 'P':
 		case 't':
-		case 'T':flag=1,flag1=3;glutPostRedisplay();break;
+		case 'T':flag=1,flag1=3;b=0.0,c=0.0;glutPostRedisplay();break;
 		case 'y':
 		case 'Y':flag=1;flag1=0;glutPostRedisplay();break;
 		case 'n':
@@ -814,8 +896,39 @@ void mykeyboard(unsigned char key,int x,int y)
 		case 'M':flag=1;flag1=0;glutPostRedisplay();break;
 		default:return;
 	}
+}
+	if(kflag==1)
+	{
+		if(key!=32)
+		{
+		string[sp]=key;
+		sp++;
+		}
+		if(key==8)
+		{
+			sp=sp-2;
+			string[sp]=' ';
+			glutPostRedisplay();
+		}
+	}
 	glutPostRedisplay();
 }
+
+
+void myReshape(int w, int h)
+{
+	glViewport(0, 0, w, h);
+	gluOrtho2D(0.0,w,0.0,h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	if (w <= h)
+		glOrtho(-2.0, 2.0, -2.0 * (GLfloat) h / (GLfloat) w, 2.0 * (GLfloat) h / (GLfloat) w, -10.0, 10.0);
+	else
+		glOrtho(-2.0 * (GLfloat) w / (GLfloat) h, 2.0 * (GLfloat) w / (GLfloat) h, -2.0, 2.0, -10.0, 10.0);
+	glMatrixMode(GL_MODELVIEW);
+	glutPostRedisplay();
+}
+
 
 
 void myInit()
@@ -841,39 +954,16 @@ void myInit()
 			glLoadIdentity();
 }
 
-void messaget()
-{
-	glBegin(GL_POLYGON);
-				glColor3f(0.0,0.1,0.3);
-				glVertex2i(0,500);
-				glColor3f(0.0,0.5,0.6);
-				glVertex2i(0,0);
-				glColor3f(0.0,0.5,0.6);
-				glVertex2i(500,0);
-				glColor3f(0.0,0.1,0.3);
-				glVertex2i(500,500);
-		glEnd();
-		setFont(GLUT_BITMAP_HELVETICA_18);
-		glColor3f(0.0,0.0,0.0);
-		drawstring(150.0,480.0,1.0,"MESSAGE TRANSMISSION");
-		glPushMatrix();
-		glScalef(1.5,1.5,1.5);
-		computer(0);
-		glPopMatrix();
-		glPushMatrix();
-		glTranslatef(0.0,-50.0,0.0);
-		glScalef(1.5,1.5,1.5);
-		computer(200);
-		glPopMatrix();
-		glColor3f(0.0,0.0,0.0);
-		drawstring(50.0,320.0,1.0,"Message Sent");
-		if(b>=850)
-		 drawstring(350.0,300.0,1.0,"Message recieved");
-}
 
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
+	if(kflag==1)
+	{
+     inputtext();
+	}
+	else
+	{
 	if(flag==0)
 	{
 		title();
@@ -952,16 +1042,7 @@ void display(void)
 			}
 			glEnd();
 			glPopMatrix();
-			//delay();
-			/*glPushMatrix();
-			glColor3f(0.0,0.0,00.0);
-			glBegin(GL_POLYGON);//rectangular body
-			glVertex2f(100.0,910.0);
-			glVertex2f(212.0,910.0);
-			glVertex2f(212.0,850.0);
-			glVertex2f(100.0,850.0);
-			glEnd();*/
-				glutPostRedisplay();
+			glutPostRedisplay();
 
 			glPopMatrix();
 			glutSwapBuffers();
@@ -991,7 +1072,6 @@ void display(void)
 			glTranslatef(b,c,0.0);
 			message(200);
 			glPopMatrix();
-
 			glutPostRedisplay();
 			glutSwapBuffers();
 			if(c>120)
@@ -1010,17 +1090,15 @@ void display(void)
 		decryptmes();
 	}
 	}
-
+}
 }
 
 int main(int argc, char ** argv)
 {
-     	printf("\nEnter a message less than ten characters\n");
-     	scanf("%s",string);
-			len=strlen(string);
 			glutInit(&argc,argv);
       glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE);
       glutInitWindowPosition(0,0);
+			glutReshapeFunc(myReshape);
       glutInitWindowSize(1000,1000);
       glutCreateWindow("RSA ");
       glutKeyboardFunc(mykeyboard);
